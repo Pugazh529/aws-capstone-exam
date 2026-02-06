@@ -1,0 +1,37 @@
+---
+- name: Configure Web Servers for StreamLine App
+  hosts: webservers
+  become: yes
+
+  tasks:
+
+    - name: Update apt packages
+      apt:
+        update_cache: yes
+
+    - name: Install Apache2
+      apt:
+        name: apache2
+        state: present
+
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+
+    - name: Install MySQL Client
+      apt:
+        name: mysql-client
+        state: present
+
+    - name: Clone application from GitHub
+      git:
+        repo: "https://github.com/<your-username>/aws-capstone-exam.git"
+        dest: /var/www/html/
+        version: main
+        force: yes
+
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
