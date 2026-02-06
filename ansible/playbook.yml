@@ -1,37 +1,22 @@
----
-- name: Configure Web Servers for StreamLine App
-  hosts: webservers
+- hosts: webservers
   become: yes
-
   tasks:
-
-    - name: Update apt packages
+    - name: Install Apache2, Git, MySQL client
       apt:
+        name: [apache2, git, mysql-client]
+        state: present
         update_cache: yes
 
-    - name: Install Apache2
-      apt:
-        name: apache2
-        state: present
-
-    - name: Install Git
-      apt:
-        name: git
-        state: present
-
-    - name: Install MySQL Client
-      apt:
-        name: mysql-client
-        state: present
-
-    - name: Clone application from GitHub
-      git:
-        repo: "https://github.com/<your-username>/aws-capstone-exam.git"
+    - name: Deploy static site from Jenkins workspace
+      copy:
+        src: "{{ web_src }}/"
         dest: /var/www/html/
-        version: main
-        force: yes
+        owner: www-data
+        group: www-data
+        mode: '0644'
 
-    - name: Restart Apache
+    - name: Ensure Apache is running
       service:
         name: apache2
-        state: restarted
+        state: started
+        enabled: yes
