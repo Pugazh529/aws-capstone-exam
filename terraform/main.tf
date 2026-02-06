@@ -15,12 +15,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# Your public IP in CIDR format, e.g., "49.204.xx.xx/32"
-variable "my_ip" {
-  type    = string
-  default = "YOUR_PUBLIC_IP/32"
-}
-
 # Choose two AZs
 variable "azs" {
   type    = list(string)
@@ -147,13 +141,6 @@ resource "aws_security_group" "db_sg" {
   tags = { Name = "streamline-db-sg" }
 }
 
-############################################
-# One key pair for all EC2s
-############################################
-resource "aws_key_pair" "streamline" {
-  key_name   = "streamline-key"
-  public_key = file(var.ssh_public_key_path)
-}
 
 ############################################
 # RDS: Subnet group + MySQL instance
@@ -182,19 +169,19 @@ resource "aws_db_instance" "mysql" {
   tags = { Name = "streamline-rds" }
 }
 
-############################################
-# EC2 Instances (Ubuntu) in default public subnets
-############################################
 resource "aws_instance" "web" {
   count                       = 2
   ami                         = var.ubuntu_ami
-  instance_type               = "t2.micro"
+  instance_type               = "t3.micro"
   subnet_id                   = local.selected_public_subnet_ids[count.index]
   vpc_security_group_ids      = [aws_security_group.web_sg.id]
   associate_public_ip_address = true
-  key_name                    = aws_key_pair.streamline.key_name
 
-  tags = { Name = "streamline-web-${count.index + 1}" }
+  key_name = "02-06-2026-Nvirginia"   # ← use your existing AWS key pair name
+
+  tags = {
+    Name = "streamline-web-${count.index + 1}"
+  }
 }
 
 ############################################
