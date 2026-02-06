@@ -172,7 +172,7 @@ resource "aws_db_instance" "mysql" {
 resource "aws_instance" "web" {
   count                       = 2
   ami                         = var.ubuntu_ami
-  instance_type               = "t3.micro"
+  instance_type               = "t3.small"
   subnet_id                   = local.selected_public_subnet_ids[count.index]
   vpc_security_group_ids      = [aws_security_group.web_sg.id]
   associate_public_ip_address = true
